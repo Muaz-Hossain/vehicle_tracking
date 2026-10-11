@@ -6,10 +6,13 @@ from ultralytics import YOLO
 from deep_sort_realtime.deepsort_tracker import DeepSort
 
 st.title("🚗 Vehicle Tracking & Counting")                   
+@st.cache_resource
+def load_model():
+    return YOLO("yolov8n.pt")
 
-model = YOLO("yolov8n.pt", verbose=False)
+model = load_model()
 
-# files.upload
+# files upload
 uploaded = st.file_uploader("Upload Video", type=["mp4", "avi", "mov"])  
 
 if uploaded and st.button("Start"):                          # new
@@ -22,6 +25,9 @@ if uploaded and st.button("Start"):                          # new
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 
+    scale = 640 / width if width > 640 else 1.0
+    width, height = int(width * scale), int(height * scale)
+    
     tracker = DeepSort(max_age=50, n_init=3, nms_max_overlap=0.5)
 
     line_y = height // 2
@@ -33,12 +39,14 @@ if uploaded and st.button("Start"):                          # new
 
     frame_box = st.empty()                                   
 
-    while True:
+    while frame_count < 900::
         ret, frame = cap.read()
         if not ret:
             break
         frame_count += 1
         if frame_count % frame_skip != 0:
+            frame = cv2.resize(frame, (width, height))
+            
             continue
 
         # run yolo
@@ -80,4 +88,4 @@ if uploaded and st.button("Start"):                          # new
         frame_box.image(frame, channels="BGR")               # update
 
     cap.release()
-    st.success(f"মোট গণনা করা গাড়ি: {len(cross_ids)}")      # নতুন
+    st.success(f"Total Vehicle count: {len(cross_ids)}")     
