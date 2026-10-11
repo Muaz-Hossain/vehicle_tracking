@@ -39,16 +39,15 @@ if uploaded and st.button("Start"):                          # new
 
     frame_box = st.empty()                                   
 
-    while frame_count < 900::
+    while frame_count < 900:
         ret, frame = cap.read()
         if not ret:
             break
         frame_count += 1
         if frame_count % frame_skip != 0:
-            frame = cv2.resize(frame, (width, height))
             
             continue
-
+        frame = cv2.resize(frame, (width, height))
         # run yolo
     
         results = model.predict(frame, verbose=False, classes=vehicles_classes)
