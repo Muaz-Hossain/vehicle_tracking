@@ -31,7 +31,7 @@ if uploaded and st.button("Start"):                          # new
     tracker = DeepSort(max_age=50, n_init=3, nms_max_overlap=0.5)
 
     line_y = height // 2
-    frame_skip = 3
+    frame_skip = 1
     frame_count = 0
     cross_ids = set()
     prev_y = {}                                              # update
